@@ -1,73 +1,112 @@
-# Turborepo starter
+# TurboRepo Study
+1. [apps] repo package.json (추가 필요)
 
-This is an official pnpm starter turborepo.
-
-## What's inside?
-
-This turborepo uses [pnpm](https://pnpm.io) as a package manager. It includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `ui`: a stub React component library shared by both `web` and `docs` applications
-- `eslint-config-custom`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `tsconfig`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
+package.json
 ```
-cd my-turborepo
-pnpm run build
+{
+  "name": "admin",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3002",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "ui": "workspace:*", <-- 공유받을 패키지
+    "@next/font": "13.1.6",
+    "@types/node": "^17.0.12",
+    "@types/react": "18.0.27",
+    "@types/react-dom": "18.0.10",
+    "eslint": "8.33.0",
+    "eslint-config-next": "13.0.0",
+    "next": "^13.1.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "typescript": "4.9.5"
+  }
+}
 ```
 
-### Develop
-
-To develop all apps and packages, run the following command:
-
+next.config.js [app monorepo 필수 설정]
 ```
-cd my-turborepo
-pnpm run dev
-```
-
-### Remote Caching
-
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup), then enter the following commands:
-
-```
-cd my-turborepo
-pnpm dlx turbo login
+module.exports = {
+  reactStrictMode: true,
+  transpilePackages: ["ui"],
+};
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your turborepo:
 
+2. 각 서피스별 구동
+   1. 전체 구동
+   ```
+   pnpm run dev 
+   ```
+   
+   2. 각 모노레포별 구동
+   ```
+   pnpm run dev --filter 이름
+   ```
+   
+   3. tailwind 설치
+      1. app monorepo에 설치
+      ```
+      pnpm install -D tailwindcss postcss autoprefixer --filter 이름
+   
+      cd apps/이름
+      npx tailwindcss init
+      ```
+
+      2. 공용 컴포넌트 monorepo 설치
+      ```
+      pnpm install -D tailwindcss postcss autoprefixer --filter ui
+   
+      cd packages/ui
+      npx tailwindcss init
+      ```
+   
+      3. tailwind 설정
+         1. apps monorepo tailwind.config.js
+         ```
+         module.exports = {
+            content: [
+               "./src/**/*.{js,jsx,ts,tsx}"
+               ,"../../packages/ui/**/*.{js,jsx,ts,tsx}" <-- 공유받을 공유 컴포넌트 위치
+            ],
+            theme: {
+               extend: {},
+            },
+            plugins: [],
+         }
+         ```
+         
+         2. ui monorepo tailwind.config.js
+         ```
+         module.exports = {
+            content: [
+                "./src/**/*.{js,jsx,ts,tsx}"
+            ],
+            theme: {
+                extend: {},
+            },
+            plugins: [],
+         }
+         ```
+         
+        3. tailwind css postcss.config.js 각 디렉토리에 적용
+        ```
+        module.exports = {
+            plugins: {
+                tailwindcss: {},
+                autoprefixer: {},
+            },
+        };
+        ```
+
+
+4. 빌드
 ```
-pnpm dlx turbo link
+pnpm run build --filter 이름
 ```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
