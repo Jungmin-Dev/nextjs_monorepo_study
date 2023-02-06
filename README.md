@@ -39,7 +39,7 @@ module.exports = {
 
 
 
-2. 각 서피스별 구동
+2. 각 서비스별 구동
    1. 전체 구동
    ```
    pnpm run dev 
